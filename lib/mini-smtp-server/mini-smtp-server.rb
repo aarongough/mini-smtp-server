@@ -2,9 +2,7 @@ require 'gserver'
 
 class MiniSmtpServer < GServer
 
-  def initialize(port = 2525, host = "127.0.0.1", max_responses = 0, *args)
-    @max_responses = max_responses
-    @responses = 0
+  def initialize(port = 2525, host = "127.0.0.1", *args)
     super(port, host, *args)
   end
   
@@ -23,8 +21,6 @@ class MiniSmtpServer < GServer
     io.print "221 bye\r\n"
     io.close
     new_message_event(Thread.current[:message])
-    @responses += 1
-    stop if(@responses == @max_responses)
   end
 
   def process_line(line)

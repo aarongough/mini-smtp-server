@@ -20,14 +20,26 @@ class MiniSmtpServerTest < Test::Unit::TestCase
   
   def setup
     $messages = []
+    @server = TestSmtpServer.new
+    @server.start
   end
   
   test "should receive new message" do
-    @server = TestSmtpServer.new(2525, "127.0.0.1", 1)
-    @server.start
     assert_difference("$messages.length") do
       send_mail
     end
+  end
+  
+  test "should receive 10 new messages" do
+    assert_difference("$messages.length", 10) do
+      10.times do
+        send_mail
+      end
+    end
+  end
+  
+  def teardown
+    @server.stop
     @server.join
   end
   
