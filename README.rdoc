@@ -1,0 +1,9 @@
+= mini-smtp-server
+
+mini-smtp-server is a small and easily customizable SMTP server. It is designed mainly to be integrated into other systems that will decide what to do with the mail that is received. By default mini-smtp-server stores any mail it receives in an SQLite database, which makes it easy to use this database an interface for other software to retrieve the emails.
+
+=== Author & Credits
+
+Author:: {Aaron Gough}[mailto:aaron@aarongough.com]
+
+Copyright (c) 2010 {Aaron Gough}[http://thingsaaronmade.com/] ({thingsaaronmade.com}[http://thingsaaronmade.com/]), released under the MIT license
