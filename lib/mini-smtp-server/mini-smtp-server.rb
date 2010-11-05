@@ -16,7 +16,7 @@ class MiniSmtpServer < GServer
 	      data = io.readpartial(4096)
 	      log("<<< " + data) if(@audit)
 	      output = process_line(data)
-        log(">>> " + output) unless(output.empty? || !@audit)
+        log(">>> " + output) if(@audit && !output.empty?)
 	      io.print(output) unless output.empty?
       end
       break if(!@connection_active || io.closed?)
