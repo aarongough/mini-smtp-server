@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mini-smtp-server}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Aaron Gough"]
@@ -20,8 +20,10 @@ Gem::Specification.new do |s|
     "MIT-LICENSE",
      "README.rdoc",
      "Rakefile",
+     "VERSION",
      "lib/mini-smtp-server.rb",
      "lib/mini-smtp-server/mini-smtp-server.rb",
+     "mini-smtp-server.gemspec",
      "test/setup/.gitignore",
      "test/setup/custom_assertions.rb",
      "test/setup/test_unit_extensions.rb",
