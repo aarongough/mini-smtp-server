@@ -20,7 +20,7 @@ class MiniSmtpServerTest < Test::Unit::TestCase
   
   def setup
     $messages = []
-    @server = TestSmtpServer.new
+    @server = TestSmtpServer.new(1234)
     @server.start
   end
   
@@ -38,7 +38,31 @@ class MiniSmtpServerTest < Test::Unit::TestCase
     end
   end
   
+  test "should store email from address in hash" do
+    assert_difference("$messages.length") do
+      send_mail
+    end
+    assert_equal "<smtp@test.com>", $messages.first[:from]
+  end
+  
+  test "should store email to address in hash" do
+    assert_difference("$messages.length") do
+      send_mail
+    end
+    assert_equal "<some1@test.com>", $messages.first[:to]
+  end
+  
+  test "should store email body in message hash" do
+    assert_difference("$messages.length") do
+      send_mail
+    end
+    assert_equal $example_mail.gsub("\n", "\r\n"), $messages.first[:data]
+  end
+  
   def teardown
+    @server.shutdown
+    while(@server.connections > 0)
+    end
     @server.stop
     @server.join
   end
@@ -46,8 +70,10 @@ class MiniSmtpServerTest < Test::Unit::TestCase
   private
   
     def send_mail(message = $example_mail, from_address = "smtp@test.com", to_address = "some1@test.com")
-      Net::SMTP.start('127.0.0.1', 2525) do |smtp|
+      Net::SMTP.start('127.0.0.1', 1234) do |smtp|
         smtp.send_message(message, from_address, to_address)
+        smtp.finish
+        sleep 0.01
       end
     end
   

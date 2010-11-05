@@ -2,25 +2,29 @@ require 'gserver'
 
 class MiniSmtpServer < GServer
 
-  def initialize(port = 2525, host = "127.0.0.1", *args)
-    super(port, host, *args)
+  def initialize(port = 2525, host = "127.0.0.1", max_connections = 1, *args)
+    super(port, host, max_connections, *args)
   end
   
   def serve(io)
-    Thread.current[:data_mode] = false
-    Thread.current[:message] = {:data => ""}
-    Thread.current[:state] = :active
+    @data_mode = false
+    @message = {:data => ""}
+    @connection_active = true
     io.print "220 hello\r\n"
     loop do
       if IO.select([io], nil, nil, 0.1)
 	      data = io.readpartial(4096)
-	      io.print(process_line(data))
+	      log("<<< " + data) if(@audit)
+	      output = process_line(data)
+        log(">>> " + output) unless(output.empty? || !@audit)
+	      io.print(output) unless output.empty?
       end
-      break if((Thread.current[:state] == :inactive) || io.closed?)
+      break if(!@connection_active || io.closed?)
     end
     io.print "221 bye\r\n"
     io.close
-    new_message_event(Thread.current[:message])
+    @message[:data].gsub!(/\r\n\Z/, '').gsub!(/\.\Z/, '')
+    new_message_event(@message)
   end
 
   def process_line(line)
@@ -29,31 +33,32 @@ class MiniSmtpServer < GServer
     when (/^(HELO|EHLO)/)
       return "220 go on...\r\n"
     when (/^QUIT/)
-      Thread.current[:state] = :inactive
+      @connection_active = false
       return ""
     when (/^MAIL FROM\:/)
-      Thread.current[:message][:from] = line.gsub(/^MAIL FROM\:/, '').strip
+      @message[:from] = line.gsub(/^MAIL FROM\:/, '').strip
       return "220 OK\r\n"
     when (/^RCPT TO\:/)
-      Thread.current[:message][:to] = line.gsub(/^RCPT TO\:/, '').strip
+      @message[:to] = line.gsub(/^RCPT TO\:/, '').strip
       return "220 OK\r\n"
     when (/^DATA/)
-      Thread.current[:data_mode] = true
+      @data_mode = true
       return "354 Enter message, ending with \".\" on a line by itself\r\n"
     end
     
     # If we are in data mode and the entire message consists
     # solely of a period on a line by itself then we
     # are being told to exit data mode
-    if((Thread.current[:data_mode]) && (line.chomp =~ /^.$/))
-      Thread.current[:data_mode] = false
+    if((@data_mode) && (line.chomp =~ /^\.$/))
+      @message[:data] += line
+      @data_mode = false
       return "220 OK\r\n"
     end
     
     # If we are in date mode then we need to add
     # the new data to the message
-    if(Thread.current[:data_mode])
-      Thread.current[:message][:data] += line
+    if(@data_mode)
+      @message[:data] += line
       return ""
     else
       # If we somehow get to this point then
