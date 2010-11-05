@@ -2,7 +2,7 @@ require 'gserver'
 
 class MiniSmtpServer < GServer
 
-  def initialize(port = 2525, host = "127.0.0.1", max_connections = 1, *args)
+  def initialize(port = 2525, host = "127.0.0.1", max_connections = 4, *args)
     super(port, host, max_connections, *args)
   end
   
