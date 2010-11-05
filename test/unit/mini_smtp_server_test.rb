@@ -20,7 +20,7 @@ class MiniSmtpServerTest < Test::Unit::TestCase
   
   def setup
     $messages = []
-    @server = TestSmtpServer.new(1234)
+    @server = TestSmtpServer.new
     @server.start
   end
   
@@ -70,7 +70,7 @@ class MiniSmtpServerTest < Test::Unit::TestCase
   private
   
     def send_mail(message = $example_mail, from_address = "smtp@test.com", to_address = "some1@test.com")
-      Net::SMTP.start('127.0.0.1', 1234) do |smtp|
+      Net::SMTP.start('127.0.0.1', 2525) do |smtp|
         smtp.send_message(message, from_address, to_address)
         smtp.finish
         sleep 0.01
