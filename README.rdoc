@@ -1,12 +1,6 @@
 = mini-smtp-server
 
-MiniSmtpServer is a small and easily customizable SMTP server. It is designed mainly to be integrated into other systems that will decide what to do with the mail that is received. By default mini-smtp-server operates as a black-hole and does not do anything with the mail being sent to it... Don't let that discourage you though, as the system is designed to be extremely easy to customize which makes it fit more easily into your system!
-
-=== Installation
-
-MiniSmtpServer is packaged as a RubyGem, so installing it is as easy as:
-
-  gem install mini-smtp-server
+MiniSmtpServer is a small and easily customizable SMTP server. It is designed mainly to be integrated into other systems that will decide what to do with the mail that is received. By default mini-smtp-server operates as a black-hole and does not do anything with the mail being sent to it... Don't let that discourage you though, as MiniSmtpServer is designed to be extremely easy to customize which makes it fit more easily into your system!
 
 === Using the server
 
@@ -14,13 +8,13 @@ To run the default server simply use:
 
   # Create a new server instance listening at 127.0.0.1:2525
   # and accepting a maximum of 4 simultaneous connections
-  server = MiniSmtpServer.new(port_number = 2525, host = "127.0.0.1", max_connections = 4)
+  server = MiniSmtpServer.new(2525, "127.0.0.1", 4)
   
   # Start the server
   server.start
   
   # ...
-  # serving requests
+  # serving requests & doing other work here
   # ...
   
   # Shutdown the server without interrupting any connections:
@@ -30,6 +24,12 @@ To run the default server simply use:
   end
   server.stop
   server.join
+  
+=== Installation
+
+For convenience MiniSmtpServer is packaged as a RubyGem, to install it simply enter the following at your command line:
+
+  gem install mini-smtp-server
 
 === Customizing the server
 
@@ -73,6 +73,6 @@ If you have a great example of something you've done with MiniSmtpServer let me 
 
 Author:: {Aaron Gough}[mailto:aaron@aarongough.com]
 
-MiniSmtpServer was inspired by code written by {Peter Cooper}[http://peterc.org/]
+MiniSmtpServer is based on code originally written by {Peter Cooper}[http://peterc.org/]
 
 Copyright (c) 2010 {Aaron Gough}[http://thingsaaronmade.com/] ({thingsaaronmade.com}[http://thingsaaronmade.com/]), released under the MIT license
