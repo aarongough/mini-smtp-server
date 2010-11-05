@@ -68,6 +68,5 @@ class MiniSmtpServer < GServer
   end
   
   def new_message_event(message_hash)
-    puts message_hash[:data]
   end
 end
