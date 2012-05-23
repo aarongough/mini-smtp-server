@@ -72,6 +72,7 @@ If you have a great example of something you've done with MiniSmtpServer let me 
 === Author & Credits
 
 Author:: {Aaron Gough}[mailto:aaron@aarongough.com]
+Contributors:: {Greg Reinacker}[https://github.com/greinacker]
 
 MiniSmtpServer is based on code originally written by {Peter Cooper}[http://peterc.org/]
 

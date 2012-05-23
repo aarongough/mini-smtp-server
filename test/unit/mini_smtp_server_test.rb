@@ -37,6 +37,12 @@ class MiniSmtpServerTest < Test::Unit::TestCase
       end
     end
   end
+
+  test "should receive 2 new messages on a single connection" do
+    assert_difference("$messages.length", 2) do
+      send_multiple_mails($example_mail, "smtp@test.com", "some1@test.com", 2)
+    end
+  end
   
   test "should store email from address in hash" do
     assert_difference("$messages.length") do
@@ -72,6 +78,18 @@ class MiniSmtpServerTest < Test::Unit::TestCase
     def send_mail(message = $example_mail, from_address = "smtp@test.com", to_address = "some1@test.com")
       Net::SMTP.start('127.0.0.1', 2525) do |smtp|
         smtp.send_message(message, from_address, to_address)
+        smtp.finish
+        sleep 0.01
+      end
+    end
+
+    def send_multiple_mails(message = $example_mail, from_address = "smtp@test.com", to_address = "some1@test.com", count = 1)
+      Net::SMTP.start('127.0.0.1', 2525) do |smtp|
+        msg_num = 0
+        while (msg_num < count) do
+          smtp.send_message(message, from_address, to_address)
+          msg_num += 1
+        end
         smtp.finish
         sleep 0.01
       end
