@@ -31,16 +31,16 @@ class MiniSmtpServer < GServer
     # Handle specific messages from the client
     case line
     when (/^(HELO|EHLO)/)
-      return "220 go on...\r\n"
+      return "250 #{Socket.gethostname} go on...\r\n"
     when (/^QUIT/)
       Thread.current[:connection_active] = false
       return ""
     when (/^MAIL FROM\:/)
       Thread.current[:message][:from] = line.gsub(/^MAIL FROM\:/, '').strip
-      return "220 OK\r\n"
+      return "250 OK\r\n"
     when (/^RCPT TO\:/)
       Thread.current[:message][:to] = line.gsub(/^RCPT TO\:/, '').strip
-      return "220 OK\r\n"
+      return "250 OK\r\n"
     when (/^DATA/)
       Thread.current[:data_mode] = true
       return "354 Enter message, ending with \".\" on a line by itself\r\n"
@@ -52,7 +52,7 @@ class MiniSmtpServer < GServer
     if((Thread.current[:data_mode]) && (line.chomp =~ /^\.$/))
       Thread.current[:message][:data] += line
       Thread.current[:data_mode] = false
-      return "220 OK\r\n"
+      return "250 OK\r\n"
     end
     
     # If we are in date mode then we need to add
