@@ -8,7 +8,7 @@ class MiniSmtpServer < GServer
   
   def serve(io)
     Thread.current[:data_mode] = false
-    Thread.current[:message] = {:data => ""}
+    Thread.current[:message] = {:data => "", :to => []}
     Thread.current[:connection_active] = true
     io.print "220 hello\r\n"
     loop do
@@ -39,7 +39,7 @@ class MiniSmtpServer < GServer
       Thread.current[:message][:from] = line.gsub(/^MAIL FROM\:/, '').strip
       return "250 OK\r\n"
     when (/^RCPT TO\:/)
-      Thread.current[:message][:to] = line.gsub(/^RCPT TO\:/, '').strip
+      Thread.current[:message][:to] << line.gsub(/^RCPT TO\:/, '').strip
       return "250 OK\r\n"
     when (/^DATA/)
       Thread.current[:data_mode] = true

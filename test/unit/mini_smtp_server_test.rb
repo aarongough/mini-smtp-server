@@ -49,7 +49,12 @@ class MiniSmtpServerTest < Test::Unit::TestCase
     assert_difference("$messages.length") do
       send_mail
     end
-    assert_equal "<some1@test.com>", $messages.first[:to]
+    assert_equal ["<some1@test.com>"], $messages.first[:to]
+  end
+
+  test "should support multiple recipients" do
+    send_mail($example_mail, "smtp@test.com", ["some1@test.com", "some2@test.com"])
+    assert_equal ["<some1@test.com>", "<some2@test.com>"], $messages.first[:to]
   end
   
   test "should store email body in message hash" do
