@@ -56,6 +56,18 @@ class MiniSmtpServerTest < Test::Unit::TestCase
     send_mail($example_mail, "smtp@test.com", ["some1@test.com", "some2@test.com"])
     assert_equal ["<some1@test.com>", "<some2@test.com>"], $messages.first[:to]
   end
+
+  test "should support multiple emails in a single smtp session" do
+      Net::SMTP.start('127.0.0.1', 2525) do |smtp|
+        smtp.send_message("Some email data", "smtp@test.com", "some1@test.com")
+        smtp.send_message("Some more email data", "smtp2@test.com", "some2@test.com")
+      end
+      sleep 0.01
+      assert_equal 2, $messages.count
+
+      assert_equal({:data => "Some email data\r\n", :from => "<smtp@test.com>", :to => ["<some1@test.com>"]}, $messages[0])
+      assert_equal({:data => "Some more email data\r\n", :from => "<smtp2@test.com>", :to => ["<some2@test.com>"]}, $messages[1])
+  end
   
   test "should store email body in message hash" do
     assert_difference("$messages.length") do
