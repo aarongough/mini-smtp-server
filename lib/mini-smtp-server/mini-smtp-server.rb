@@ -8,7 +8,7 @@ class MiniSmtpServer < GServer
   
   def serve(io)
     Thread.current[:data_mode] = false
-    Thread.current[:message] = {:data => ""}
+    reset_message
     Thread.current[:connection_active] = true
     io.print "220 hello\r\n"
     loop do
@@ -23,8 +23,6 @@ class MiniSmtpServer < GServer
     end
     io.print "221 bye\r\n"
     io.close
-    Thread.current[:message][:data].gsub!(/\r\n\Z/, '').gsub!(/\.\Z/, '')
-    new_message_event(Thread.current[:message])
   end
 
   def process_line(line)
@@ -39,7 +37,7 @@ class MiniSmtpServer < GServer
       Thread.current[:message][:from] = line.gsub(/^MAIL FROM\:/, '').strip
       return "250 OK\r\n"
     when (/^RCPT TO\:/)
-      Thread.current[:message][:to] = line.gsub(/^RCPT TO\:/, '').strip
+      Thread.current[:message][:to] << line.gsub(/^RCPT TO\:/, '').strip
       return "250 OK\r\n"
     when (/^DATA/)
       Thread.current[:data_mode] = true
@@ -52,6 +50,10 @@ class MiniSmtpServer < GServer
     if((Thread.current[:data_mode]) && (line.chomp =~ /^\.$/))
       Thread.current[:message][:data] += line
       Thread.current[:data_mode] = false
+
+      Thread.current[:message][:data].gsub!(/\r\n\Z/, '').gsub!(/\.\Z/, '')
+      new_message_event(Thread.current[:message])
+      reset_message
       return "250 OK\r\n"
     end
     
@@ -68,5 +70,11 @@ class MiniSmtpServer < GServer
   end
   
   def new_message_event(message_hash)
+  end
+
+  private
+
+  def reset_message
+    Thread.current[:message] = {:data => "", :to => []}
   end
 end
