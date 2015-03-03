@@ -75,6 +75,6 @@ Author:: {Aaron Gough}[mailto:aaron@aarongough.com]
 
 MiniSmtpServer is based on code originally written by {Peter Cooper}[http://peterc.org/]
 
-You may also be interested in MidiSMTPServer: {https://github.com/4commerce-technologies-AG/midi-smtp-server/} [https://github.com/4commerce-technologies-AG/midi-smtp-server/]
+You may also be interested in MidiSMTPServer: {https://github.com/4commerce-technologies-AG/midi-smtp-server/}[https://github.com/4commerce-technologies-AG/midi-smtp-server/]
 
 Copyright (c) 2010 {Aaron Gough}[http://thingsaaronmade.com/] ({thingsaaronmade.com}[http://thingsaaronmade.com/]), released under the MIT license
