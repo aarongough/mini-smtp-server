@@ -28,7 +28,7 @@ class MiniSmtpServer < GServer
   def process_line(line)
     # Handle specific messages from the client
     case line
-    when (/^(HELO|EHLO)/)
+    when (/^(HELO|EHLO)/i)
       return "250 #{Socket.gethostname} go on...\r\n"
     when (/^QUIT/)
       Thread.current[:connection_active] = false
