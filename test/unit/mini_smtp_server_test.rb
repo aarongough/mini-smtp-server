@@ -3,6 +3,10 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'test_helper.rb
 class TestSmtpServer < MiniSmtpServer
   def new_message_event(message_hash)
     $messages << message_hash
+
+    if message_hash[:to] == ['<bad@test.com>']
+      return "252 I'll give it a shot\r\n"
+    end
   end
 end
 
@@ -17,19 +21,19 @@ This is a test message.
 EOD
 
 class MiniSmtpServerTest < Test::Unit::TestCase
-  
+
   def setup
     $messages = []
     @server = TestSmtpServer.new
     @server.start
   end
-  
+
   test "should receive new message" do
     assert_difference("$messages.length") do
       send_mail
     end
   end
-  
+
   test "should receive 10 new messages" do
     assert_difference("$messages.length", 10) do
       10.times do
@@ -37,14 +41,14 @@ class MiniSmtpServerTest < Test::Unit::TestCase
       end
     end
   end
-  
+
   test "should store email from address in hash" do
     assert_difference("$messages.length") do
       send_mail
     end
     assert_equal "<smtp@test.com>", $messages.first[:from]
   end
-  
+
   test "should store email to address in hash" do
     assert_difference("$messages.length") do
       send_mail
@@ -68,14 +72,19 @@ class MiniSmtpServerTest < Test::Unit::TestCase
       assert_equal({:data => "Some email data\r\n", :from => "<smtp@test.com>", :to => ["<some1@test.com>"]}, $messages[0])
       assert_equal({:data => "Some more email data\r\n", :from => "<smtp2@test.com>", :to => ["<some2@test.com>"]}, $messages[1])
   end
-  
+
   test "should store email body in message hash" do
     assert_difference("$messages.length") do
       send_mail
     end
     assert_equal $example_mail.gsub("\n", "\r\n"), $messages.first[:data]
   end
-  
+
+  test "should allow custom responses" do
+    response = send_mail($example_mail, "smtp@test.com", "bad@test.com")
+    assert_equal response.status, "252"
+  end
+
   def teardown
     @server.shutdown
     while(@server.connections > 0)
@@ -83,15 +92,16 @@ class MiniSmtpServerTest < Test::Unit::TestCase
     @server.stop
     @server.join
   end
-  
+
   private
-  
+
     def send_mail(message = $example_mail, from_address = "smtp@test.com", to_address = "some1@test.com")
       Net::SMTP.start('127.0.0.1', 2525) do |smtp|
-        smtp.send_message(message, from_address, to_address)
+        response = smtp.send_message(message, from_address, to_address)
         smtp.finish
         sleep 0.01
+        response
       end
     end
-  
+
 end

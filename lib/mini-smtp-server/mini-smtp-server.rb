@@ -1,11 +1,12 @@
 require 'gserver'
 
 class MiniSmtpServer < GServer
+  VALID_RESPONSE = /\A[1-5][0-9]{2}.+\r\n\Z/
 
   def initialize(port = 2525, host = "127.0.0.1", max_connections = 4, *args)
     super(port, host, max_connections, *args)
   end
-  
+
   def serve(io)
     Thread.current[:data_mode] = false
     reset_message
@@ -43,7 +44,7 @@ class MiniSmtpServer < GServer
       Thread.current[:data_mode] = true
       return "354 Enter message, ending with \".\" on a line by itself\r\n"
     end
-    
+
     # If we are in data mode and the entire message consists
     # solely of a period on a line by itself then we
     # are being told to exit data mode
@@ -52,11 +53,13 @@ class MiniSmtpServer < GServer
       Thread.current[:data_mode] = false
 
       Thread.current[:message][:data].gsub!(/\r\n\Z/, '').gsub!(/\.\Z/, '')
-      new_message_event(Thread.current[:message])
+      response = new_message_event(Thread.current[:message])
       reset_message
-      return "250 OK\r\n"
+
+      # Allow new_message_event to set it's own response
+      return response.to_s.match(VALID_RESPONSE) ? response : "250 OK\r\n"
     end
-    
+
     # If we are in date mode then we need to add
     # the new data to the message
     if(Thread.current[:data_mode])
@@ -68,7 +71,7 @@ class MiniSmtpServer < GServer
       return "500 ERROR\r\n"
     end
   end
-  
+
   def new_message_event(message_hash)
   end
 
