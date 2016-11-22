@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
      "test/test_helper.rb",
      "test/unit/mini_smtp_server_test.rb"
   ]
+  s.add_runtime_dependency 'gserver'
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
