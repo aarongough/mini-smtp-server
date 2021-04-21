@@ -1,3 +1,6 @@
+= NOTE:
+This project is no longer under active development and is not maintained. If you would like an actively maintained, API compatible, replacement please see 'MIDI SMTP Server': https://github.com/4commerce-technologies-AG/midi-smtp-server
+
 = mini-smtp-server
 
 MiniSmtpServer is a small and easily customizable SMTP server. It is designed mainly to be integrated into other systems that will decide what to do with the mail that is received. By default mini-smtp-server operates as a black-hole and does not do anything with the mail being sent to it... Don't let that discourage you though, as MiniSmtpServer is designed to be extremely easy to customize which makes it fit more easily into your system!
