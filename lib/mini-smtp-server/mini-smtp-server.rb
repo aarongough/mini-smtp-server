@@ -13,10 +13,10 @@ class MiniSmtpServer < GServer
     io.print "220 hello\r\n"
     loop do
       if IO.select([io], nil, nil, 0.1)
-	      data = io.readpartial(4096)
+	      data = io.readline()
 	      log("<<< " + data) if(@audit)
 	      output = process_line(data)
-        log(">>> " + output) if(@audit && !output.empty?)
+              log(">>> " + output) if(@audit && !output.empty?)
 	      io.print(output) unless output.empty?
       end
       break if(!Thread.current[:connection_active] || io.closed?)
